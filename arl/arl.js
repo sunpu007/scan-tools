@@ -1,3 +1,19 @@
+/**
+ * ===========================================================================
+ *  【严禁用于任何危害性操作】
+ *
+ *  本脚本会向 ARL 派发「子域爆破 / 全端口扫描 / 服务识别 / 漏洞探测」任务，
+ *  属于主动扫描行为。
+ *
+ *  仅允许对「你拥有」或「已获得明确书面授权」的目标使用。
+ *  任何未经授权的扫描、探测、入侵、数据获取均属违法，可能触犯
+ *  《网络安全法》《数据安全法》《刑法》第 285 / 286 条。
+ *  后果由使用者自行承担，作者不承担任何责任，也不提供滥用支持。
+ *
+ *  无法确认是否已获授权时，请立即停止使用。
+ * ===========================================================================
+ */
+
 const axios = require('axios');
 const fs = require('fs');
 
@@ -38,7 +54,7 @@ async function historyIsTask(name, target) {
 
 async function taskIsExist(name, target) {
   const result = await axios.request({
-    url: 'http://arl.myjerry.cn/api/task',
+    url: 'http://domain/api/task',
     headers: { token: TOKEN },
     params: { name, target, },
   });
@@ -94,5 +110,19 @@ async function createTask(name, target) {
     console.warn('create task failed: name: %s, target: %s, 错误信息：%s', name, target, result.status, result.data.message);
   }
 }
+
+// 运行前先打印授权提示，避免 README 被跳过
+console.warn(
+  [
+    '',
+    '==========================================================================',
+    '  警告：本脚本会派发主动扫描任务（子域爆破 / 全端口 / 服务识别 / 漏洞探测）',
+    '  仅允许对「你拥有」或「已获得明确书面授权」的目标使用。',
+    '  未经授权的扫描、探测、入侵、数据获取均属违法，后果由使用者自行承担。',
+    '  无法确认已获授权时，请立即按 Ctrl+C 停止。',
+    '==========================================================================',
+    '',
+  ].join('\n')
+);
 
 main();
