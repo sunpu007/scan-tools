@@ -1,0 +1,35 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/client.js",
+  "scripts": {
+    "test": "mocha --reporter spec --timeout 3000 test/*.test.js",
+    "test-cov": "nyc -e .ts -r=html -r=text -r=lcov npm run test",
+    "build": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.26",
+    "nyc": "^15.0.0",
+    "source-map-support": "^0.5.16",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "@alicloud/bssopenapi20171214": "^4.1.1",
+    "@alicloud/tea-typescript": "latest",
+    "@alicloud/ecs20140526": "2.0.2",
+    "@alicloud/openapi-client": "^0.3.0",
+    "@alicloud/tea-console": "^1.0.0",
+    "@alicloud/darabonba-env": "^1.0.0",
+    "@alicloud/darabonba-string": "^1.0.0",
+    "@alicloud/sts20150401": "^1.2.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

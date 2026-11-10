@@ -1,0 +1,38 @@
+{
+  "name": "scan-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.18.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.18.0",
+  "dependencies": {
+    "@alicloud/bssopenapi20171214": "^4.1.1",
+    "@alicloud/darabonba-env": "^1.0.0",
+    "@alicloud/darabonba-string": "^1.0.0",
+    "@alicloud/ecs20140526": "2.0.2",
+    "@alicloud/openapi-client": "^0.3.0",
+    "@alicloud/sts20150401": "^1.2.0",
+    "@alicloud/tea-console": "^1.0.0",
+    "@alicloud/tea-typescript": "latest",
+    "axios": "^1.21.0",
+    "@huaweicloud/huaweicloud-sdk-core": "^3.1.206",
+    "@huaweicloud/huaweicloud-sdk-ecs": "^3.1.218",
+    "@huaweicloud/huaweicloud-sdk-iam": "^3.1.219",
+    "@huaweicloud/huaweicloud-sdk-vpc": "^3.1.206",
+    "tencentcloud-sdk-nodejs-cvm": "^4.1.316",
+    "tencentcloud-sdk-nodejs-vpc": "^4.1.317",
+    "tencentcloud-sdk-slim-nodejs": "^4.1.323"
+  }
+}

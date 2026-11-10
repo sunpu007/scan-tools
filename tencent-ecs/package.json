@@ -1,0 +1,15 @@
+{
+  "name": "tencent-ecs",
+  "version": "1.0.0",
+  "main": "accountBalance.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "tencentcloud-sdk-slim-nodejs": "^4.1.323"
+  }
+}
