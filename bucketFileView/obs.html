@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>华为 OBS 图片预览</title>
+  <style>
+    #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; font-size: 12px; }
+    .thumb { width: 100%; height: 140px; object-fit: cover; background: #f5f5f5; display: block; }
+    .meta { padding: 6px; word-break: break-all; }
+    .err { color: #c00; }
+  </style>
+</head>
+<body>
+  <h3>图片预览 <span id="status">加载中…</span></h3>
+  <div id="grid"></div>
+
+  <script>
+    // 未授权的 obs 地址
+    const BUCKET = 'https://domain.obs.cn-east-3.myhuaweicloud.com';
+    const IMG_EXT = /\.(jpe?g|png|gif|webp|bmp|svg|avif|ico|tiff?)$/i;
+
+    // OBS ListBucketResult 可能带命名空间，统一用 NS 取
+    const pick = (node, name) =>
+      node.getElementsByTagNameNS('*', name)[0]?.textContent ?? null;
+
+    // 拼接对象 URL：Key 需要逐段 encodeURIComponent（保留 /）
+    function objectUrl(key) {
+      const path = key.split('/').map(encodeURIComponent).join('/');
+      return `${BUCKET}/${path}`;
+    }
+
+    // 简单探活：先 HEAD 再看 content-type（可选，CORS 需允许 HEAD）
+    async function isImageByHeader(url) {
+      try {
+        const r = await fetch(url, { method: 'HEAD' });
+        const ct = r.headers.get('content-type') || '';
+        return ct.startsWith('image/');
+      } catch {
+        return null; // 无法判断（CORS/网络）
+      }
+    }
+
+    function makeCard(key, url) {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.loading = 'lazy';
+      img.src = url;
+      img.alt = key;
+      img.onerror = () => {
+        // 加载失败（非图片 / 私有桶 / CORS）
+        const ph = document.createElement('div');
+        ph.className = 'thumb err';
+        ph.style.display = 'flex';
+        ph.style.alignItems = 'center';
+        ph.style.justifyContent = 'center';
+        ph.textContent = '无法预览';
+        img.replaceWith(ph);
+      };
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `<div title="${key}">${key.split('/').pop()}</div>`;
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = '打开原图';
+      meta.appendChild(a);
+
+      card.append(img, meta);
+      return card;
+    }
+
+    async function main() {
+      const status = document.getElementById('status');
+      const grid = document.getElementById('grid');
+
+      // 1) 拉列表
+      const res = await fetch(BUCKET + '/');
+      if (!res.ok) throw new Error(`列表请求失败 HTTP ${res.status}`);
+      const text = await res.text();
+
+      const doc = new DOMParser().parseFromString(text, 'text/xml');
+      if (doc.querySelector('parsererror')) throw new Error('XML 解析失败');
+
+      // 私有桶会返回 <Error><Code>AccessDenied</Code>...
+      const errCode = pick(doc, 'Code');
+      if (errCode) throw new Error(`OBS 错误: ${errCode}`);
+
+      // 2) 提取所有 Key
+      const keys = [...doc.getElementsByTagNameNS('*', 'Contents')]
+        .map(c => pick(c, 'Key'))
+        .filter(Boolean);
+
+      status.textContent = `共 ${keys.length} 个对象`;
+
+      // 3) 按扩展名过滤图片
+      let imgKeys = keys.filter(k => IMG_EXT.test(k));
+
+      // 扩展名判断不准时，可 HEAD 校验 content-type（可选，慢）
+      // imgKeys = [];
+      // for (const k of keys) {
+      //   const url = objectUrl(k);
+      //   if (await isImageByHeader(url)) imgKeys.push(k);
+      // }
+
+      status.textContent = `共 ${keys.length} 个对象，其中图片 ${imgKeys.length} 个`;
+
+      // 4) 渲染预览
+      const frag = document.createDocumentFragment();
+      for (const k of imgKeys) frag.appendChild(makeCard(k, objectUrl(k)));
+      grid.appendChild(frag);
+    }
+
+    main().catch(e => {
+      document.getElementById('status').textContent = '❌ ' + e.message;
+      console.error(e);
+    });
+  </script>
+</body>
+</html>
